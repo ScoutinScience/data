@@ -1,0 +1,25 @@
+# Labels used across the catalog. Change wording here; it updates every page.
+
+kinds:
+  model: Model
+  service: Service
+  library: Library
+  store: Data store
+
+# status -> badge label and legend text (colours live in _sass/custom/custom.scss)
+statuses:
+  ok:
+    label: "Served · persisting"
+    legend: "Served and persisting output"
+  warn:
+    label: "No endpoint"
+    legend: "No endpoint — in-process or library"
+  stop:
+    label: "Not integrated"
+    legend: "Output not persisted or not integrated"
+  store:
+    label: "Store"
+    legend: "Data store"
+  todo:
+    label: "To document"
+    legend: "Not documented yet"

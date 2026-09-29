@@ -1,0 +1,137 @@
+// Catalog styling (ported from the SiS Model & Data Catalog layout demo).
+// Just the Docs imports this file automatically.
+
+:root {
+  --sis-surface: #ffffff; --sis-surface-2: #e9eeed;
+  --sis-ink: #131f1e; --sis-ink-2: #475856; --sis-ink-3: #758885;
+  --sis-line: #d5dedc; --sis-line-strong: #b9c6c4;
+  --sis-accent: #0f6b66; --sis-accent-ink: #0b4f4b; --sis-accent-soft: #dcebe9;
+  --sis-ok: #1d7549;    --sis-ok-soft: #dcece2;
+  --sis-warn: #96660b;  --sis-warn-soft: #f2e8d2;
+  --sis-stop: #ad3d2a;  --sis-stop-soft: #f5e2dd;
+  --sis-store: #5b6f8c; --sis-store-soft: #e2e8f0;
+  --sis-todo: #8a9593;  --sis-todo-soft: #eceeed;
+  --sis-mono: "IBM Plex Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sis-serif: "IBM Plex Serif", Georgia, serif;
+}
+
+body { font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+h1, .sis-entry h1 { font-family: var(--sis-serif); letter-spacing: -.015em; }
+a { color: var(--sis-accent-ink); }
+
+// ---------- shared bits ----------
+.sis-entry, .sis-rail, .sis-tally { color: var(--sis-ink); }
+.sis-entry code, .sis-entry .mono { font-family: var(--sis-mono); font-size: 12.5px; }
+.none { color: var(--sis-ink-3); font-size: 12.5px; }
+
+[data-s="ok"]    { --s: var(--sis-ok);    --s-soft: var(--sis-ok-soft); }
+[data-s="warn"]  { --s: var(--sis-warn);  --s-soft: var(--sis-warn-soft); }
+[data-s="stop"]  { --s: var(--sis-stop);  --s-soft: var(--sis-stop-soft); }
+[data-s="store"] { --s: var(--sis-store); --s-soft: var(--sis-store-soft); }
+[data-s="todo"]  { --s: var(--sis-todo);  --s-soft: var(--sis-todo-soft); }
+
+// ---------- entry page ----------
+.sis-entry .phead { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.sis-entry .phead h1 { margin: 0; flex: 1 1 auto; min-width: 200px; }
+.sis-entry .kind, .sis-entry .status {
+  font-family: var(--sis-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+}
+.sis-entry .kind { background: var(--sis-surface-2); color: var(--sis-ink-2); }
+.sis-entry .status { background: var(--s-soft); color: var(--s); }
+.sis-entry .desc { color: var(--sis-ink-2); max-width: 66ch; margin: 12px 0 0; }
+
+.sis-entry dl.meta {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 26px;
+  margin: 18px 0 0; padding: 15px 0 0; border-top: 1px solid var(--sis-line); font-size: 13px;
+}
+.sis-entry dl.meta div { min-width: 0; }
+.sis-entry dl.meta dt {
+  font-family: var(--sis-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--sis-ink-3); font-weight: 400;
+}
+.sis-entry dl.meta dd { margin: 3px 0 0; overflow-wrap: anywhere; }
+.sis-entry dl.meta dd p { margin: 0; }
+
+h3.sec {
+  font-size: 11.5px !important; font-family: var(--sis-mono); font-weight: 400;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--sis-ink-3);
+  margin: 30px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--sis-line);
+}
+h3.sec b { color: var(--sis-ink-2); font-weight: 500; }
+
+.sis-entry .tablewrap { overflow-x: auto; }
+.sis-entry .tablewrap table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 520px; display: table; box-shadow: none; }
+.sis-entry .tablewrap th {
+  text-align: left; font-weight: 500; color: var(--sis-ink-3); font-size: 10.5px;
+  font-family: var(--sis-mono); letter-spacing: .08em; text-transform: uppercase;
+  padding: 0 14px 8px 0; border: 0; border-bottom: 1px solid var(--sis-line); background: none;
+}
+.sis-entry .tablewrap td { padding: 11px 14px 11px 0; border: 0; border-bottom: 1px solid var(--sis-line); vertical-align: top; background: none; }
+.sis-entry .tablewrap tr:last-child td { border-bottom: 0; }
+.srcname { font-weight: 500; }
+.srcnote { display: block; color: var(--sis-ink-3); font-size: 12.5px; margin-top: 3px; max-width: 46ch; }
+.sis-entry td .mono { color: var(--sis-ink-2); }
+
+.minichip { font-size: 12.5px; color: var(--sis-accent-ink); }
+.minichip.missing, .flowchip.missing { color: var(--sis-stop); border-style: dashed; cursor: help; }
+
+.sis-entry .lineage { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; }
+@media (max-width: 760px) { .sis-entry .lineage { grid-template-columns: 1fr; } }
+.sis-entry .lineage .side { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.sis-entry .hub {
+  font-family: var(--sis-mono); font-size: 12px; text-align: center; padding: 12px 14px;
+  border: 1px solid var(--sis-line-strong); border-radius: 5px; background: var(--sis-surface-2);
+}
+.flowchip {
+  display: block; font-size: 13px; border: 1px solid var(--sis-line); border-radius: 5px;
+  padding: 8px 10px; color: var(--sis-accent-ink); text-decoration: none;
+}
+a.flowchip:hover { border-color: var(--sis-accent); background: var(--sis-accent-soft); text-decoration: none; }
+.flowchip .what { display: block; color: var(--sis-ink-3); font-size: 12px; margin-top: 2px; }
+.flowchip .arrow { color: var(--sis-ink-3); font-family: var(--sis-mono); }
+.sidelabel {
+  font-family: var(--sis-mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--sis-ink-3); margin-bottom: 1px;
+}
+
+ul.flags { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
+ul.flags li { display: grid; grid-template-columns: 3px 1fr; gap: 12px; font-size: 13.5px; color: var(--sis-ink-2); margin: 0; }
+ul.flags li::before { content: "" !important; position: static !important; border-radius: 2px; background: var(--sis-warn); }
+ul.flags li[data-l="blocker"]::before { background: var(--sis-stop); }
+ul.flags li b, ul.flags li strong { color: var(--sis-ink); font-weight: 600; }
+
+// ---------- catalog rail ----------
+.sis-tally {
+  display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 0 0 20px;
+  font-family: var(--sis-mono); font-size: 12.5px; color: var(--sis-ink-2);
+}
+.sis-tally b { color: var(--sis-ink); font-weight: 500; }
+.sis-tally .bad b { color: var(--sis-stop); }
+
+.sis-rail { max-width: 560px; }
+.sis-search {
+  width: 100%; font: inherit; font-size: 14px; padding: 9px 12px; margin-bottom: 12px;
+  border: 1px solid var(--sis-line-strong); border-radius: 6px; background: var(--sis-surface); color: var(--sis-ink);
+}
+.sis-search:focus-visible { outline: 2px solid var(--sis-accent); outline-offset: 1px; }
+.sis-rail .domain {
+  font-family: var(--sis-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--sis-ink-3); padding: 15px 2px 5px;
+}
+.sis-rail .sis-group:first-of-type .domain { padding-top: 0; }
+.sis-rail .srv {
+  display: grid; grid-template-columns: 3px 1fr auto; align-items: center; gap: 10px;
+  border-radius: 5px; padding: 6px 8px 6px 0; color: var(--sis-ink); text-decoration: none;
+}
+.sis-rail .srv[hidden] { display: none; }
+.sis-rail .srv:hover { background: var(--sis-surface-2); text-decoration: none; }
+.sis-rail .srv .stripe { height: 24px; border-radius: 2px; background: var(--s); }
+.sis-rail .srv .nm { font-weight: 500; font-size: 13.5px; line-height: 1.3; }
+.sis-rail .srv .nm .k { margin-left: 8px; font-family: var(--sis-mono); font-size: 10.5px; font-weight: 400; color: var(--sis-ink-3); text-transform: uppercase; letter-spacing: .06em; }
+.sis-rail .srv .ct { font-family: var(--sis-mono); font-size: 11px; color: var(--sis-ink-3); }
+.sis-rail .legend {
+  margin-top: 16px; padding-top: 13px; border-top: 1px solid var(--sis-line);
+  display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--sis-ink-2);
+}
+.sis-rail .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 7px; vertical-align: 1px; background: var(--s); }

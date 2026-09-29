@@ -1,0 +1,55 @@
+{%- comment -%}
+  Grouped list of catalog entries (the "rail").
+  Params: group (optional — only show this group), filter (true to show the search box)
+{%- endcomment -%}
+{%- assign _entries = site.pages | where_exp: "p", "p.entry_id != nil" | sort: "title" -%}
+{%- if include.group -%}
+  {%- assign _entries = _entries | where: "group", include.group -%}
+{%- endif -%}
+{%- assign _groups = _entries | group_by: "group" | sort: "name" -%}
+<div class="sis-rail">
+  {%- if include.filter -%}
+  <input class="sis-search" type="search" placeholder="Filter by name, kind, location, input, output…" autocomplete="off" aria-label="Filter the catalog">
+  {%- endif -%}
+  {%- for g in _groups -%}
+  <div class="sis-group">
+    {%- unless include.group -%}<div class="domain">{{ g.name | default: "Ungrouped" }}</div>{%- endunless -%}
+    {%- for e in g.items -%}
+      {%- assign _n = e.inputs.size | plus: e.outputs.size | plus: e.fields.size -%}
+      {%- capture _hay -%}{{ e.title }} {{ e.kind }} {{ e.group }} {{ e.location }} {{ e.serving }} {% for i in e.inputs %}{{ i.name }} {{ i.form }} {% endfor %}{% for o in e.outputs %}{{ o.name }} {{ o.note }} {% endfor %}{% for f in e.fields %}{{ f.name }} {% endfor %}{%- endcapture -%}
+    <a class="srv" href="{{ e.url | relative_url }}" data-s="{{ e.status | default: 'todo' }}" data-hay="{{ _hay | downcase | strip_newlines | escape }}">
+      <span class="stripe"></span>
+      <span class="nm">{{ e.title }}<span class="k">{{ site.data.catalog.kinds[e.kind] | default: e.kind }}</span></span>
+      <span class="ct" title="Inputs + outputs + fields">{{ _n }}</span>
+    </a>
+    {%- endfor -%}
+  </div>
+  {%- endfor -%}
+  {%- if _entries.size == 0 -%}<div class="none">No entries yet.</div>{%- endif -%}
+  <div class="none sis-nomatch" hidden>No match.</div>
+  <div class="legend">
+    {%- for s in site.data.catalog.statuses -%}
+    <div><i data-s="{{ s[0] }}"></i>{{ s[1].legend }}</div>
+    {%- endfor -%}
+  </div>
+</div>
+{%- if include.filter -%}
+<script>
+(function () {
+  var rail = document.currentScript.previousElementSibling;
+  var box = rail.querySelector(".sis-search");
+  box.addEventListener("input", function () {
+    var q = box.value.trim().toLowerCase(), any = false;
+    rail.querySelectorAll(".sis-group").forEach(function (g) {
+      var shown = 0;
+      g.querySelectorAll(".srv").forEach(function (a) {
+        var ok = !q || a.dataset.hay.indexOf(q) !== -1 || a.textContent.toLowerCase().indexOf(q) !== -1;
+        a.hidden = !ok; if (ok) shown++;
+      });
+      g.hidden = shown === 0; if (shown) any = true;
+    });
+    rail.querySelector(".sis-nomatch").hidden = any;
+  });
+})();
+</script>
+{%- endif -%}

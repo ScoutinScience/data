@@ -1,0 +1,20 @@
+{%- comment -%}
+  Renders a link to another catalog entry.
+  Params: id (entry_id of the target), what (optional note), dir ("in" | "out" | empty), style ("chip" | "mini")
+{%- endcomment -%}
+{%- assign _t = site.pages | where: "entry_id", include.id | first -%}
+{%- if _t -%}
+  {%- assign _name = _t.title -%}
+{%- else -%}
+  {%- assign _name = include.id -%}
+{%- endif -%}
+{%- if include.style == "mini" -%}
+  {%- if _t -%}<a class="minichip" href="{{ _t.url | relative_url }}">{{ _name }}</a>{%- else -%}<span class="minichip missing" title="No entry with entry_id '{{ include.id }}'">{{ _name }}</span>{%- endif -%}
+{%- else -%}
+  {%- if _t -%}<a class="flowchip" href="{{ _t.url | relative_url }}">{%- else -%}<span class="flowchip missing" title="No entry with entry_id '{{ include.id }}'">{%- endif -%}
+  {%- if include.dir == "in" -%}<span class="arrow">→ </span>{%- endif -%}
+  {{ _name }}
+  {%- if include.dir == "out" -%}<span class="arrow"> →</span>{%- endif -%}
+  {%- if include.what and include.what != "" -%}<span class="what">{{ include.what }}</span>{%- endif -%}
+  {%- if _t -%}</a>{%- else -%}</span>{%- endif -%}
+{%- endif -%}

@@ -1,6 +1,6 @@
 # Site settings
 title: "ScoutinScience Data"
-description: "Data source connections for ScoutinScience, and how to interact with them."
+description: "Catalog of ScoutinScience models, services and data stores: what goes in, what comes out, and how they connect."
 baseurl: "/data"                       # repo name -> https://scoutinscience.github.io/data/
 url: "https://scoutinscience.github.io"
 
@@ -19,5 +19,13 @@ search_enabled: true
 
 # Show an image instead of the site title:
 # logo: "/assets/images/logo.png"
+
+# "Edit this page on GitHub" link at the bottom of every page
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitHub"
+gh_edit_repository: "https://github.com/ScoutinScience/data"
+gh_edit_branch: "Github-Pages"
+gh_edit_source: docs
+gh_edit_view_mode: "edit"
 
 footer_content: "Maintained by ScoutinScience."

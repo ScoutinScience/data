@@ -1,0 +1,122 @@
+---
+layout: default
+---
+{%- comment -%}
+  One catalog entry (model, service, library or data store).
+  Everything is read from the page's front matter — see "Adding an entry".
+{%- endcomment -%}
+{%- assign isStore = false -%}
+{%- if page.kind == "store" -%}{%- assign isStore = true -%}{%- endif -%}
+{%- assign st = page.status | default: "todo" -%}
+{%- assign entries = site.pages | where_exp: "p", "p.entry_id != nil" -%}
+
+{%- comment -%} Upstream = my inputs' sources + anything whose outputs land in me {%- endcomment -%}
+{%- assign up = "" -%}
+{%- for i in page.inputs -%}{%- for f in i.from -%}{%- assign up = up | append: f | append: "|" -%}{%- endfor -%}{%- endfor -%}
+{%- for p in entries -%}{%- for o in p.outputs -%}{%- if o.to contains page.entry_id -%}{%- assign up = up | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
+{%- assign up = up | split: "|" | uniq -%}
+
+{%- comment -%} Downstream = where my outputs land + anything that reads from me {%- endcomment -%}
+{%- assign down = "" -%}
+{%- for o in page.outputs -%}{%- for t in o.to -%}{%- assign down = down | append: t | append: "|" -%}{%- endfor -%}{%- endfor -%}
+{%- for p in entries -%}{%- for i in p.inputs -%}{%- if i.from contains page.entry_id -%}{%- assign down = down | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
+{%- assign down = down | split: "|" | uniq -%}
+
+<div class="sis-entry">
+  <div class="phead">
+    <h1>{{ page.title }}</h1>
+    <span class="kind">{{ site.data.catalog.kinds[page.kind] | default: page.kind | default: "—" }}</span>
+    <span class="status" data-s="{{ st }}">{{ site.data.catalog.statuses[st].label | default: st }}</span>
+  </div>
+  {%- if page.description and page.description != "" %}
+  <p class="desc">{{ page.description | markdownify | remove: "<p>" | remove: "</p>" }}</p>
+  {%- endif %}
+
+  <dl class="meta">
+    <div><dt>Location</dt><dd>{% if page.location %}<code>{{ page.location }}</code>{% else %}<span class="none">—</span>{% endif %}</dd></div>
+    <div><dt>{% if isStore %}Kind{% else %}Serving surface{% endif %}</dt><dd>{{ page.serving | default: "—" | markdownify | remove: "<p>" | remove: "</p>" }}</dd></div>
+    <div><dt>Group</dt><dd>{{ page.group | default: "—" }}</dd></div>
+    {%- if page.version and page.version != "" %}
+    <div><dt>Version pin</dt><dd><code>{{ page.version }}</code></dd></div>
+    {%- endif %}
+    {%- if page.owner and page.owner != "" %}
+    <div><dt>Owner</dt><dd>{{ page.owner }}</dd></div>
+    {%- endif %}
+  </dl>
+
+  {%- if page.fields and page.fields.size > 0 %}
+  <h3 class="sec">Columns and who writes them — <b>{{ page.fields.size }}</b></h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Written by</th></tr></thead>
+    <tbody>
+    {%- for f in page.fields %}
+      <tr>
+        <td><span class="srcname">{{ f.name }}</span>{% if f.note %}<span class="srcnote">{{ f.note }}</span>{% endif %}</td>
+        <td><span class="mono">{{ f.type | default: "—" }}</span></td>
+        <td>{% if f.written_by %}{% for w in f.written_by %}{% include entry_chip.html id=w style="mini" %}{% unless forloop.last %}<br>{% endunless %}{% endfor %}{% else %}<span class="none">—</span>{% endif %}</td>
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+  {%- endif %}
+
+  {%- if page.inputs and page.inputs.size > 0 %}
+  <h3 class="sec">Inputs — <b>{{ page.inputs.size }}</b></h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Input</th><th>Form</th></tr></thead>
+    <tbody>
+    {%- for i in page.inputs %}
+      <tr>
+        <td><span class="srcname">{{ i.name }}</span>{% if i.from and i.from.size > 0 %}<span class="srcnote">from {% for f in i.from %}{% include entry_chip.html id=f style="mini" %}{% unless forloop.last %}, {% endunless %}{% endfor %}</span>{% endif %}</td>
+        <td><span class="mono">{{ i.form | default: "—" }}</span></td>
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+  {%- endif %}
+
+  {%- if page.outputs and page.outputs.size > 0 %}
+  <h3 class="sec">Outputs — <b>{{ page.outputs.size }}</b></h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Output</th><th>Lands in</th></tr></thead>
+    <tbody>
+    {%- for o in page.outputs %}
+      <tr>
+        <td><span class="srcname">{{ o.name }}</span>{% if o.note %}<span class="srcnote">{{ o.note }}</span>{% endif %}</td>
+        <td>{% if o.to and o.to.size > 0 %}{% for t in o.to %}{% include entry_chip.html id=t style="mini" %}{% unless forloop.last %}<br>{% endunless %}{% endfor %}{% else %}<span class="none">Not persisted</span>{% endif %}</td>
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+  {%- endif %}
+
+  <h3 class="sec">Interactions</h3>
+  <div class="lineage">
+    <div class="side">
+      <div class="sidelabel">{% if isStore %}Written by{% else %}Depends on{% endif %} — {{ up.size }}</div>
+      {%- for id in up %}{% unless id == page.entry_id %}{% include entry_chip.html id=id dir="in" %}{% endunless %}{% endfor %}
+      {%- if up.size == 0 %}<div class="none">None recorded.</div>{% endif %}
+    </div>
+    <div class="hub">{{ page.title }}</div>
+    <div class="side">
+      <div class="sidelabel">{% if isStore %}Read by{% else %}Feeds{% endif %} — {{ down.size }}</div>
+      {%- for id in down %}{% unless id == page.entry_id %}{% include entry_chip.html id=id dir="out" %}{% endunless %}{% endfor %}
+      {%- if down.size == 0 %}<div class="none">None recorded.</div>{% endif %}
+    </div>
+  </div>
+
+  {%- if page.open_questions and page.open_questions.size > 0 %}
+  <h3 class="sec">Open questions — <b>{{ page.open_questions.size }}</b></h3>
+  <ul class="flags">
+    {%- for q in page.open_questions %}
+    <li data-l="{{ q.level | default: 'open' }}"><span>{{ q.text | markdownify | remove: "<p>" | remove: "</p>" }}</span></li>
+    {%- endfor %}
+  </ul>
+  {%- endif %}
+</div>
+
+{%- assign notes = content | strip -%}
+{%- if notes != "" %}
+<h3 class="sec">Notes</h3>
+{{ content }}
+{%- endif %}
