@@ -1,0 +1,7 @@
+# Generated site
+_site/
+.jekyll-cache/
+.sass-cache/
+
+# No need to save Gemfile.lock. This can lead to using outdated gems.
+Gemfile.lock
