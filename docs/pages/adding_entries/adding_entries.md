@@ -27,8 +27,9 @@ Entries live under their project and section, e.g. `docs/matchmaking/grants/`. T
 | `parent`, `grand_parent` | yes | Where it sits in the menu, e.g. `Grants` / `Matchmaking` |
 | `entry_id` | yes | Short unique id other entries use to link here, e.g. `grants-matcher` |
 | `group` | yes | Heading it sits under in the catalog, usually the section name |
-| `kind` | yes | `model`, `service`, `library` or `store` |
-| `status` | yes | `ok`, `warn`, `stop`, `store` or `todo` — labels and colours in `_data/catalog.yml` |
+| `kind` | yes | `model`, `service`, `library`, `intake` (a data intake, e.g. a grant source) or `store` |
+| `method` | intakes | How the data is collected: API, scraper, manual, … |
+| `status` | yes | `ok`, `warn`, `stop`, `store`, `active` or `todo` — labels and colours in `_data/catalog.yml` |
 | `description` | | One or two sentences |
 | `location` | | Repo path, or table / topic name for a store |
 | `serving` | | Endpoint, port or job — or "None" |

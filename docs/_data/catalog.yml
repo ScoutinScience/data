@@ -4,6 +4,7 @@ kinds:
   model: Model
   service: Service
   library: Library
+  intake: Data intake
   store: Data store
 
 # status -> badge label and legend text (colours live in _sass/custom/custom.scss)
@@ -20,6 +21,9 @@ statuses:
   store:
     label: "Store"
     legend: "Data store"
+  active:
+    label: "Active"
+    legend: "Active data intake"
   todo:
     label: "To document"
     legend: "Not documented yet"

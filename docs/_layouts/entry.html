@@ -33,8 +33,13 @@ layout: default
   {%- endif %}
 
   <dl class="meta">
-    <div><dt>Location</dt><dd>{% if page.location %}<code>{{ page.location }}</code>{% else %}<span class="none">—</span>{% endif %}</dd></div>
+    <div><dt>{% if page.kind == "intake" %}Source{% else %}Location{% endif %}</dt><dd>{% if page.location %}<code>{{ page.location }}</code>{% else %}<span class="none">—</span>{% endif %}</dd></div>
+    {%- if page.kind == "intake" %}
+    <div><dt>Intake method</dt><dd>{{ page.method | default: "—" }}</dd></div>
+    <div><dt>Lands in</dt><dd>{{ page.serving | default: "—" | markdownify | remove: "<p>" | remove: "</p>" }}</dd></div>
+    {%- else %}
     <div><dt>{% if isStore %}Kind{% else %}Serving surface{% endif %}</dt><dd>{{ page.serving | default: "—" | markdownify | remove: "<p>" | remove: "</p>" }}</dd></div>
+    {%- endif %}
     <div><dt>Group</dt><dd>{{ page.group | default: "—" }}</dd></div>
     {%- if page.version and page.version != "" %}
     <div><dt>Version pin</dt><dd><code>{{ page.version }}</code></dd></div>
@@ -45,15 +50,15 @@ layout: default
   </dl>
 
   {%- if page.fields and page.fields.size > 0 %}
-  <h3 class="sec">Columns and who writes them — <b>{{ page.fields.size }}</b></h3>
+  <h3 class="sec">{% if page.kind == "intake" %}Features ingested{% else %}Columns and who writes them{% endif %} — <b>{{ page.fields.size }}</b></h3>
   <div class="tablewrap"><table>
-    <thead><tr><th>Field</th><th>Type</th><th>Written by</th></tr></thead>
+    <thead><tr><th>Field</th><th>Type</th>{% unless page.kind == "intake" %}<th>Written by</th>{% endunless %}</tr></thead>
     <tbody>
     {%- for f in page.fields %}
       <tr>
         <td><span class="srcname">{{ f.name }}</span>{% if f.note %}<span class="srcnote">{{ f.note }}</span>{% endif %}</td>
         <td><span class="mono">{{ f.type | default: "—" }}</span></td>
-        <td>{% if f.written_by %}{% for w in f.written_by %}{% include entry_chip.html id=w style="mini" %}{% unless forloop.last %}<br>{% endunless %}{% endfor %}{% else %}<span class="none">—</span>{% endif %}</td>
+        {% unless page.kind == "intake" %}<td>{% if f.written_by %}{% for w in f.written_by %}{% include entry_chip.html id=w style="mini" %}{% unless forloop.last %}<br>{% endunless %}{% endfor %}{% else %}<span class="none">—</span>{% endif %}</td>{% endunless %}
       </tr>
     {%- endfor %}
     </tbody>

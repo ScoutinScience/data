@@ -25,6 +25,7 @@ a { color: var(--sis-accent-ink); }
 .none { color: var(--sis-ink-3); font-size: 12.5px; }
 
 [data-s="ok"]    { --s: var(--sis-ok);    --s-soft: var(--sis-ok-soft); }
+[data-s="active"] { --s: var(--sis-ok);    --s-soft: var(--sis-ok-soft); }
 [data-s="warn"]  { --s: var(--sis-warn);  --s-soft: var(--sis-warn-soft); }
 [data-s="stop"]  { --s: var(--sis-stop);  --s-soft: var(--sis-stop-soft); }
 [data-s="store"] { --s: var(--sis-store); --s-soft: var(--sis-store-soft); }
