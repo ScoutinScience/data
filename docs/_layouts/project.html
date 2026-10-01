@@ -1,0 +1,44 @@
+---
+layout: default
+---
+{%- comment -%}
+  A project page: its description, then every data entry that feeds it,
+  split into data in the pipeline and potential (candidate) data.
+{%- endcomment -%}
+{%- assign entries = site.pages | where_exp: "p", "p.entry_id != nil" | sort: "title" -%}
+{%- assign pid = page.project_id -%}
+
+<div class="sis-entry">
+  <div class="phead">
+    <h1>{{ page.title }}</h1>
+    <span class="kind">Project</span>
+  </div>
+</div>
+
+{{ content }}
+
+<h3 class="sec">Data in the pipeline</h3>
+{%- assign n = 0 -%}
+<div class="sis-rail">
+{%- for e in entries -%}{%- if e.projects contains pid -%}{%- assign n = n | plus: 1 -%}
+  <a class="srv" href="{{ e.url | relative_url }}" data-s="{{ e.status | default: 'todo' }}">
+    <span class="stripe"></span>
+    <span class="nm">{{ e.title }}<span class="k">{{ e.group }} · {{ site.data.catalog.kinds[e.kind] | default: e.kind }}</span></span>
+    <span class="ct">{{ e.ingestion.method }}</span>
+  </a>
+{%- endif -%}{%- endfor -%}
+{%- if n == 0 %}<div class="none">None recorded yet.</div>{% endif %}
+</div>
+
+<h3 class="sec">Potential data — not in the pipeline yet</h3>
+{%- assign n = 0 -%}
+<div class="sis-rail">
+{%- for e in entries -%}{%- if e.candidate_projects contains pid -%}{%- assign n = n | plus: 1 -%}
+  <a class="srv candidate" href="{{ e.url | relative_url }}" data-s="candidate">
+    <span class="stripe"></span>
+    <span class="nm">{{ e.title }}<span class="k">{{ e.group }} · {{ site.data.catalog.kinds[e.kind] | default: e.kind }}</span></span>
+    <span class="ct">potential</span>
+  </a>
+{%- endif -%}{%- endfor -%}
+{%- if n == 0 %}<div class="none">None recorded yet. Add <code>candidate_projects: [{{ pid }}]</code> to an entry to list it here.</div>{% endif %}
+</div>

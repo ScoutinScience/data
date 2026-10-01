@@ -14,12 +14,14 @@ layout: default
 {%- assign up = "" -%}
 {%- for i in page.inputs -%}{%- for f in i.from -%}{%- assign up = up | append: f | append: "|" -%}{%- endfor -%}{%- endfor -%}
 {%- for p in entries -%}{%- for o in p.outputs -%}{%- if o.to contains page.entry_id -%}{%- assign up = up | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
+{%- if page.ingestion.service -%}{%- assign up = up | append: page.ingestion.service | append: "|" -%}{%- endif -%}
 {%- assign up = up | split: "|" | uniq -%}
 
 {%- comment -%} Downstream = where my outputs land + anything that reads from me {%- endcomment -%}
 {%- assign down = "" -%}
 {%- for o in page.outputs -%}{%- for t in o.to -%}{%- assign down = down | append: t | append: "|" -%}{%- endfor -%}{%- endfor -%}
 {%- for p in entries -%}{%- for i in p.inputs -%}{%- if i.from contains page.entry_id -%}{%- assign down = down | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
+{%- for p in entries -%}{%- if p.ingestion.service == page.entry_id -%}{%- assign down = down | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}
 {%- assign down = down | split: "|" | uniq -%}
 
 <div class="sis-entry">
@@ -33,14 +35,22 @@ layout: default
   {%- endif %}
 
   <dl class="meta">
-    <div><dt>{% if page.kind == "intake" %}Source{% else %}Location{% endif %}</dt><dd>{% if page.location %}<code>{{ page.location }}</code>{% else %}<span class="none">—</span>{% endif %}</dd></div>
+    <div><dt>{% if page.kind == "intake" %}Source{% else %}Location{% endif %}</dt><dd>{% if page.location and page.location contains "://" %}{% assign _u = page.location | split: "/" %}<a href="{{ page.location }}">{{ _u[2] }}</a>{% elsif page.location and page.location != "" %}<code>{{ page.location }}</code>{% else %}<span class="none">—</span>{% endif %}</dd></div>
     {%- if page.kind == "intake" %}
-    <div><dt>Intake method</dt><dd>{{ page.method | default: "—" }}</dd></div>
     <div><dt>Lands in</dt><dd>{{ page.serving | default: "—" | markdownify | remove: "<p>" | remove: "</p>" }}</dd></div>
     {%- else %}
     <div><dt>{% if isStore %}Kind{% else %}Serving surface{% endif %}</dt><dd>{{ page.serving | default: "—" | markdownify | remove: "<p>" | remove: "</p>" }}</dd></div>
     {%- endif %}
-    <div><dt>Group</dt><dd>{{ page.group | default: "—" }}</dd></div>
+    <div><dt>Category</dt><dd>{{ page.group | default: "—" }}</dd></div>
+    {%- if page.ingestion or page.method %}
+    <div><dt>Method of ingestion</dt><dd>{{ page.ingestion.method | default: page.method | default: "—" }}{% if page.ingestion.service %}<span class="srcnote">via {% include entry_chip.html id=page.ingestion.service style="mini" %}</span>{% endif %}</dd></div>
+    {%- endif %}
+    {%- if page.projects.size > 0 or page.candidate_projects.size > 0 %}
+    <div><dt>Projects</dt><dd>
+      {%- for pid in page.projects %}{% assign pr = site.data.projects | where: "id", pid | first %}<a class="projchip" href="{{ pr.url | relative_url }}">{{ pr.title | default: pid }}</a>{% endfor %}
+      {%- for pid in page.candidate_projects %}{% assign pr = site.data.projects | where: "id", pid | first %}<a class="projchip candidate" href="{{ pr.url | relative_url }}" title="Potential — not in the pipeline yet">{{ pr.title | default: pid }}</a>{% endfor %}
+    </dd></div>
+    {%- endif %}
     {%- if page.version and page.version != "" %}
     <div><dt>Version pin</dt><dd><code>{{ page.version }}</code></dd></div>
     {%- endif %}
@@ -95,6 +105,8 @@ layout: default
   </table></div>
   {%- endif %}
 
+  {%- assign _links = up.size | plus: down.size -%}
+  {%- if _links > 0 or page.kind != "intake" %}
   <h3 class="sec">Interactions</h3>
   <div class="lineage">
     <div class="side">
@@ -109,6 +121,7 @@ layout: default
       {%- if down.size == 0 %}<div class="none">None recorded.</div>{% endif %}
     </div>
   </div>
+  {%- endif %}
 
   {%- if page.open_questions and page.open_questions.size > 0 %}
   <h3 class="sec">Open questions — <b>{{ page.open_questions.size }}</b></h3>

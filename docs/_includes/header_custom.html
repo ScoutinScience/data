@@ -1,0 +1,9 @@
+{%- comment -%} Project tabs across the top of every page (from _data/projects.yml). {%- endcomment -%}
+{%- if site.data.projects and site.data.projects.size > 0 -%}
+<nav class="sis-tabs" aria-label="Projects">
+  <span class="sis-tabs-label">Projects</span>
+  {%- for p in site.data.projects -%}
+  <a href="{{ p.url | relative_url }}"{% if page.url == p.url %} class="active" aria-current="page"{% endif %}>{{ p.title }}</a>
+  {%- endfor -%}
+</nav>
+{%- endif -%}
