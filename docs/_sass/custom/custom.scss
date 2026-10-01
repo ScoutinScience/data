@@ -29,6 +29,7 @@ a { color: var(--sis-accent-ink); }
 [data-s="warn"]  { --s: var(--sis-warn);  --s-soft: var(--sis-warn-soft); }
 [data-s="stop"]  { --s: var(--sis-stop);  --s-soft: var(--sis-stop-soft); }
 [data-s="store"] { --s: var(--sis-store); --s-soft: var(--sis-store-soft); }
+[data-s="candidate"] { --s: #7a5bb5; --s-soft: #ece6f6; }
 [data-s="todo"]  { --s: var(--sis-todo);  --s-soft: var(--sis-todo-soft); }
 
 // ---------- entry page ----------
@@ -136,3 +137,30 @@ ul.flags li b, ul.flags li strong { color: var(--sis-ink); font-weight: 600; }
   display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--sis-ink-2);
 }
 .sis-rail .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 7px; vertical-align: 1px; background: var(--s); }
+
+// ---------- candidate (not in pipeline) ----------
+.sis-rail .srv[data-s="candidate"] .stripe { background: repeating-linear-gradient(180deg, var(--s) 0 4px, transparent 4px 7px); }
+.sis-rail .legend i[data-s="candidate"] { background: none; border: 1.5px dashed var(--s); width: 9px; height: 9px; }
+
+// ---------- project chips ----------
+.projchip {
+  display: inline-block; margin: 0 6px 4px 0; padding: 2px 9px; border-radius: 999px;
+  font-size: 12.5px; border: 1px solid var(--sis-accent); color: var(--sis-accent-ink);
+  background: var(--sis-accent-soft); text-decoration: none;
+}
+.projchip:hover { text-decoration: none; filter: brightness(.97); }
+.projchip.candidate { background: none; border-style: dashed; color: #7a5bb5; border-color: #7a5bb5; }
+
+// ---------- project tabs in the header ----------
+.sis-tabs { display: flex; align-items: stretch; gap: 2px; height: 100%; flex: 1 1 auto; padding: 0 16px; overflow-x: auto; }
+.sis-tabs-label {
+  display: flex; align-items: center; margin-right: 8px;
+  font-family: var(--sis-mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--sis-ink-3);
+}
+.sis-tabs a {
+  display: flex; align-items: center; padding: 0 12px; white-space: nowrap;
+  font-size: 14px; font-weight: 500; color: var(--sis-ink-2); text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+.sis-tabs a:hover { color: var(--sis-accent-ink); text-decoration: none; }
+.sis-tabs a.active { color: var(--sis-accent-ink); border-bottom-color: var(--sis-accent); }

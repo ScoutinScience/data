@@ -7,6 +7,11 @@
   {%- assign _entries = _entries | where: "group", include.group -%}
 {%- endif -%}
 {%- assign _groups = _entries | group_by: "group" | sort: "name" -%}
+{%- comment -%} Order groups by _data/catalog.yml categories; unknown groups go last. {%- endcomment -%}
+{%- assign _ordered = "" | split: "" -%}
+{%- for c in site.data.catalog.categories -%}{%- for g in _groups -%}{%- if g.name == c -%}{%- assign _ordered = _ordered | push: g -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
+{%- for g in _groups -%}{%- unless site.data.catalog.categories contains g.name -%}{%- assign _ordered = _ordered | push: g -%}{%- endunless -%}{%- endfor -%}
+{%- assign _groups = _ordered -%}
 <div class="sis-rail">
   {%- if include.filter -%}
   <input class="sis-search" type="search" placeholder="Filter by name, kind, location, input, output…" autocomplete="off" aria-label="Filter the catalog">
@@ -16,7 +21,7 @@
     {%- unless include.group -%}<div class="domain">{{ g.name | default: "Ungrouped" }}</div>{%- endunless -%}
     {%- for e in g.items -%}
       {%- assign _n = e.inputs.size | plus: e.outputs.size | plus: e.fields.size -%}
-      {%- capture _hay -%}{{ e.title }} {{ e.kind }} {{ e.group }} {{ e.location }} {{ e.serving }} {% for i in e.inputs %}{{ i.name }} {{ i.form }} {% endfor %}{% for o in e.outputs %}{{ o.name }} {{ o.note }} {% endfor %}{% for f in e.fields %}{{ f.name }} {% endfor %}{%- endcapture -%}
+      {%- capture _hay -%}{{ e.title }} {{ e.kind }} {{ e.group }} {{ e.location }} {{ e.serving }} {{ e.ingestion.method }} {{ e.projects | join: " " }} {{ e.candidate_projects | join: " " }} {% for i in e.inputs %}{{ i.name }} {{ i.form }} {% endfor %}{% for o in e.outputs %}{{ o.name }} {{ o.note }} {% endfor %}{% for f in e.fields %}{{ f.name }} {% endfor %}{%- endcapture -%}
     <a class="srv" href="{{ e.url | relative_url }}" data-s="{{ e.status | default: 'todo' }}" data-hay="{{ _hay | downcase | strip_newlines | escape }}">
       <span class="stripe"></span>
       <span class="nm">{{ e.title }}<span class="k">{{ site.data.catalog.kinds[e.kind] | default: e.kind }}</span></span>

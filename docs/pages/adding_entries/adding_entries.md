@@ -1,6 +1,6 @@
 ---
 title: Adding an entry
-nav_order: 4
+nav_order: 8
 ---
 
 # Adding an entry
@@ -9,14 +9,19 @@ nav_order: 4
 1. TOC
 {:toc}
 
-Every model, service, library or data store is **one Markdown file**. The page, the catalog row, and the links between entries are all generated from its front matter, so you only ever edit that one file.
+Every data source, service or store is **one Markdown file**. Its page, its row in the catalog, its project links and its connections to other entries are all generated from the front matter, so that one file is all you edit.
 
-## 1. Pick the folder
+## 1. Pick the category folder
 
-Entries live under their project and section, e.g. `docs/matchmaking/grants/`. The quickest start is to copy one of the examples there:
+| Folder | Category |
+|:--|:--|
+| `docs/grants/` | Grants |
+| `docs/publications/` | Publications |
+| `docs/patents/` | Patents |
+| `docs/theses/` | Theses |
+| `docs/services/` | Pipeline services (scrapers, models, APIs that move or process data) |
 
-+ `example-model.md` — for a model, service or library
-+ `example-store.md` — for a table, topic, index or other data store
+The quickest start is to copy `docs/grants/nwo.md` and change it.
 
 ## 2. Fill in the front matter
 
@@ -24,35 +29,41 @@ Entries live under their project and section, e.g. `docs/matchmaking/grants/`. T
 |:--|:--|:--|
 | `layout` | yes | Always `entry` |
 | `title` | yes | Name shown in the menu and catalog — must be unique across the site |
-| `parent`, `grand_parent` | yes | Where it sits in the menu, e.g. `Grants` / `Matchmaking` |
-| `entry_id` | yes | Short unique id other entries use to link here, e.g. `grants-matcher` |
-| `group` | yes | Heading it sits under in the catalog, usually the section name |
-| `kind` | yes | `model`, `service`, `library`, `intake` (a data intake, e.g. a grant source) or `store` |
-| `method` | intakes | How the data is collected: API, scraper, manual, … |
-| `status` | yes | `ok`, `warn`, `stop`, `store`, `active` or `todo` — labels and colours in `_data/catalog.yml` |
+| `parent` | yes | The category, e.g. `Grants` |
+| `group` | yes | Same as `parent` |
+| `entry_id` | yes | Short unique id other entries use to link here, e.g. `horizon-europe` |
+| `kind` | yes | `intake` (a data source), `service`, `model`, `library` or `store` |
+| `status` | yes | `active`, `candidate` (found, not in the pipeline yet), `todo`, `ok`, `warn`, `stop` or `store` — labels and colours in `_data/catalog.yml` |
 | `description` | | One or two sentences |
-| `location` | | Repo path, or table / topic name for a store |
-| `serving` | | Endpoint, port or job — or "None" |
-| `version`, `owner` | | Optional |
-| `inputs` | | List of `name`, `form`, and `from` (list of `entry_id`s) |
-| `outputs` | | List of `name`, `note`, and `to` (list of `entry_id`s) |
-| `fields` | stores | List of `name`, `type`, and `written_by` (list of `entry_id`s) |
+| `location` | | Website for a source, repo path for a service, table name for a store |
+| `serving` | | Where the data lands, or the endpoint a service runs on |
+| `ingestion` | sources | `method` (Scraping, API, Manual, …) and `service` (the `entry_id` of the service that does it — becomes a link) |
+| `projects` | | Projects that use this data, e.g. `[matchmaking]` |
+| `candidate_projects` | | Projects it *could* feed but doesn't yet — shown dashed |
+| `fields` | | What the source provides: list of `name` and `type` |
+| `inputs` / `outputs` | services | List of `name`, `form`/`note`, and `from`/`to` (lists of `entry_id`s) |
 | `open_questions` | | List of `level` (`open` or `blocker`) and `text` |
+
+Anything below the closing `---` is free Markdown and appears under **Notes**.
 
 ## 3. Links are automatic
 
-You only record each connection once:
++ `ingestion.service: scraping-service` links the source to the Scraping service page.
++ `projects: [matchmaking]` puts the entry on the Matchmaking project page under **Data in the pipeline**; `candidate_projects` puts it under **Potential data**.
++ An input with `from: [x]` or an output with `to: [y]` shows the connection on both pages.
 
-+ An **input** with `from: [x]` makes *x* appear under **Depends on** here, and this entry appear under **Feeds** / **Read by** on *x*.
-+ An **output** with `to: [y]` makes *y* appear under **Feeds** here, and this entry appear under **Written by** on *y*.
+An `entry_id` that doesn't exist yet shows in red with a dashed border, so broken links are easy to spot.
 
-An `entry_id` that doesn't exist yet shows up in red with a dashed border, so broken links are easy to spot.
+## 4. Adding a project
 
-## 4. Adding a new project or section
+1. Add it to `docs/_data/projects.yml` (`id`, `title`, `url`) — this adds the tab at the top.
+2. Copy `docs/projects/matchmaking.md`, and change `title`, `project_id` and `permalink`.
 
-Create a folder with an `index.md`, like `docs/matchmaking/index.md` (a project) and `docs/matchmaking/grants/index.md` (a section inside it). Give the index `has_children: true`, and give its entries `parent:` (and `grand_parent:` for a section inside a project).
+## 5. Adding a category
 
-## 5. Preview locally (optional)
+Copy `docs/theses/index.md` into a new folder, change the title, `nav_order`, `permalink` and the `group` in the include, and add the name to `categories` in `docs/_data/catalog.yml`.
+
+## 6. Preview locally (optional)
 
 From the `docs` folder:
 

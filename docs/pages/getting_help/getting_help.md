@@ -1,6 +1,6 @@
 ---
 title: Getting help
-nav_order: 5
+nav_order: 9
 ---
 
 # Getting help
