@@ -1,0 +1,8 @@
+# Projects shown as tabs across the top of every page.
+# Add a project here AND a page for it in docs/projects/<id>.md.
+# Data entries link to projects with `projects: [id]` (in use) or
+# `candidate_projects: [id]` (potential, not in the pipeline yet).
+
+- id: matchmaking
+  title: Matchmaking
+  url: /projects/matchmaking/
