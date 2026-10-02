@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: How to add an entry
+    url: https://scoutinscience.github.io/data/pages/adding_entries/adding_entries.html
+    about: Criteria for a data source and how entries are added to the catalog.

@@ -1,0 +1,112 @@
+name: Propose a data source
+description: Suggest a new data source for the ScoutinScience Data catalog. It is reviewed before it's added.
+title: "[Data source] <name of the source>"
+labels: ["data source proposal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a source. Fill in what you know — the reviewer will add it to the catalog as a **candidate** if it meets the criteria below.
+        Criteria and the full process: https://scoutinscience.github.io/data/pages/adding_entries/adding_entries.html
+
+  - type: input
+    id: name
+    attributes:
+      label: Source name
+      placeholder: "e.g. ERC — European Research Council"
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Link to the source
+      placeholder: "https://…"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What the source gives us. Pick "Other" if none fits and explain below.
+      options: [Grants, Publications, Patents, Theses, Other]
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What it contains
+      description: One or two sentences — what the data is and why it's useful.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: required_attributes
+    attributes:
+      label: Required attributes it provides
+      description: For grants, every source must provide all four. For other categories, tick what applies.
+      options:
+        - label: Title
+        - label: Description
+        - label: Deadline
+        - label: Budget
+
+  - type: dropdown
+    id: method
+    attributes:
+      label: How can we collect it?
+      options: [Scraping, API, Download (file / dump), Manual, Not sure]
+    validations:
+      required: true
+
+  - type: input
+    id: access
+    attributes:
+      label: Access and terms of use
+      description: Is it free and allowed to collect? Link the terms, licence or API docs if you found them.
+      placeholder: "e.g. Open data, CC BY 4.0 — https://…"
+
+  - type: checkboxes
+    id: projects
+    attributes:
+      label: Which projects could use it?
+      options:
+        - label: Matchmaking
+        - label: GFS
+        - label: Other (explain below)
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: How urgent is it?
+      options: [High, Medium, Low]
+    validations:
+      required: true
+
+  - type: input
+    id: target_date
+    attributes:
+      label: Target date for integration (optional)
+      placeholder: "YYYY-MM-DD"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Update frequency, known gaps, contacts, examples…
+
+  - type: checkboxes
+    id: criteria
+    attributes:
+      label: Before you submit
+      options:
+        - label: I checked the catalog and this source isn't already listed.
+          required: true
+        - label: It provides the required attributes for its category (or I explained what's missing).
+          required: true
+        - label: As far as I know, we're allowed to collect it (public, licensed or via an official API).
+          required: true
+        - label: It's maintained — updated over time, not a one-off file.
+          required: false
