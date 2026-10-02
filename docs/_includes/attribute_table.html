@@ -1,0 +1,22 @@
+{%- comment -%}
+  Full attribute table of an entity, with obligatory attributes highlighted.
+  Param: entity (id from _data/entities.yml)
+{%- endcomment -%}
+{%- assign _e = site.data.entities | where: "id", include.entity | first -%}
+{%- if _e and _e.attributes.size > 0 -%}
+<div class="sis-entry"><div class="tablewrap"><table class="attr-table">
+  <thead><tr><th>Attribute</th><th>Type</th><th>Description</th><th></th></tr></thead>
+  <tbody>
+  {%- for a in _e.attributes %}
+    <tr{% if a.required %} class="req"{% endif %}>
+      <td><code>{{ a.name }}</code></td>
+      <td><span class="mono">{{ a.type }}</span></td>
+      <td>{{ a.description }}</td>
+      <td>{% if a.required %}<span class="reqbadge">Required</span>{% endif %}</td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div></div>
+{%- else -%}
+<p class="none">No attributes recorded yet — add them to <code>_data/entities.yml</code>.</p>
+{%- endif -%}

@@ -1,6 +1,6 @@
 ---
 title: Publications
-nav_order: 4
+nav_order: 3
 has_children: true
 has_toc: false
 permalink: /publications/
@@ -10,6 +10,10 @@ permalink: /publications/
 
 <!-- Describe what Publications data we collect and why. -->
 _Category overview to be written._
+
+## Publication attributes
+
+{% include attribute_table.html entity="publication" %}
 
 ## Sources
 

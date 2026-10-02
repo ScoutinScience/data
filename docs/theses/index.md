@@ -1,6 +1,6 @@
 ---
 title: Theses
-nav_order: 6
+nav_order: 5
 has_children: true
 has_toc: false
 permalink: /theses/
@@ -10,6 +10,10 @@ permalink: /theses/
 
 <!-- Describe what Theses data we collect and why. -->
 _Category overview to be written._
+
+## Thesis attributes
+
+{% include attribute_table.html entity="thesis" %}
 
 ## Sources
 
