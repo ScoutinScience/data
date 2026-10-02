@@ -11,14 +11,14 @@ plugins:
 
 # Upper-right navigation
 aux_links:
-  "Repository on GitHub":
-    - "https://github.com/ScoutinScience/data"
+  "Propose a data source":
+    - "https://github.com/ScoutinScience/data/issues/new?template=new-data-source.yml"
 
 search_enabled: true
-# color_scheme: dark
+color_scheme: sis                  # _sass/color_schemes/sis.scss
 
-# Show an image instead of the site title:
-# logo: "/assets/images/logo.png"
+# Company logo in the sidebar (served from scoutinscience.com; copy it to assets/images/ to host it here)
+logo: "https://scoutinscience.com/logos/logo-new.svg"
 
 # "Edit this page on GitHub" link at the bottom of every page
 gh_edit_link: true
