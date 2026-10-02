@@ -15,12 +15,14 @@ layout: default
 {%- for i in page.inputs -%}{%- for f in i.from -%}{%- assign up = up | append: f | append: "|" -%}{%- endfor -%}{%- endfor -%}
 {%- for p in entries -%}{%- for o in p.outputs -%}{%- if o.to contains page.entry_id -%}{%- assign up = up | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
 {%- if page.ingestion.service -%}{%- assign up = up | append: page.ingestion.service | append: "|" -%}{%- endif -%}
+{%- for p in entries -%}{%- if p.storage == page.entry_id -%}{%- assign up = up | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}
 {%- assign up = up | split: "|" | uniq -%}
 
 {%- comment -%} Downstream = where my outputs land + anything that reads from me {%- endcomment -%}
 {%- assign down = "" -%}
 {%- for o in page.outputs -%}{%- for t in o.to -%}{%- assign down = down | append: t | append: "|" -%}{%- endfor -%}{%- endfor -%}
 {%- for p in entries -%}{%- for i in p.inputs -%}{%- if i.from contains page.entry_id -%}{%- assign down = down | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}{%- endfor -%}
+{%- if page.storage -%}{%- assign down = down | append: page.storage | append: "|" -%}{%- endif -%}
 {%- for p in entries -%}{%- if p.ingestion.service == page.entry_id -%}{%- assign down = down | append: p.entry_id | append: "|" -%}{%- endif -%}{%- endfor -%}
 {%- assign down = down | split: "|" | uniq -%}
 
@@ -29,6 +31,7 @@ layout: default
     <h1>{{ page.title }}</h1>
     <span class="kind">{{ site.data.catalog.kinds[page.kind] | default: page.kind | default: "—" }}</span>
     <span class="status" data-s="{{ st }}">{{ site.data.catalog.statuses[st].label | default: st }}</span>
+    {%- include urgency.html e=page %}
   </div>
   {%- if page.description and page.description != "" %}
   <p class="desc">{{ page.description | markdownify | remove: "<p>" | remove: "</p>" }}</p>
@@ -37,11 +40,11 @@ layout: default
   <dl class="meta">
     <div><dt>{% if page.kind == "intake" %}Source{% else %}Location{% endif %}</dt><dd>{% if page.location and page.location contains "://" %}{% assign _u = page.location | split: "/" %}<a href="{{ page.location }}">{{ _u[2] }}</a>{% elsif page.location and page.location != "" %}<code>{{ page.location }}</code>{% else %}<span class="none">—</span>{% endif %}</dd></div>
     {%- if page.kind == "intake" %}
-    <div><dt>Lands in</dt><dd>{{ page.serving | default: "—" | markdownify | remove: "<p>" | remove: "</p>" }}</dd></div>
+    <div><dt>Stored in</dt><dd>{% if page.storage %}{% include entry_chip.html id=page.storage style="mini" %}{% if page.storage_table %}<span class="srcnote">table <code>{{ page.storage_table }}</code></span>{% endif %}{% else %}{{ page.serving | default: "—" }}{% endif %}</dd></div>
     {%- else %}
     <div><dt>{% if isStore %}Kind{% else %}Serving surface{% endif %}</dt><dd>{{ page.serving | default: "—" | markdownify | remove: "<p>" | remove: "</p>" }}</dd></div>
     {%- endif %}
-    <div><dt>Category</dt><dd>{{ page.group | default: "—" }}</dd></div>
+    <div><dt>{% if page.kind == "intake" %}Entity{% else %}Category{% endif %}</dt><dd>{% assign _ent = site.data.entities | where: "category", page.group | first %}{% if _ent and page.kind == "intake" %}<a href="{{ _ent.url | relative_url }}">{{ _ent.name }}</a>{% else %}{{ page.group | default: "—" }}{% endif %}</dd></div>
     {%- if page.ingestion or page.method %}
     <div><dt>Method of ingestion</dt><dd>{{ page.ingestion.method | default: page.method | default: "—" }}{% if page.ingestion.service %}<span class="srcnote">via {% include entry_chip.html id=page.ingestion.service style="mini" %}</span>{% endif %}</dd></div>
     {%- endif %}
@@ -58,6 +61,13 @@ layout: default
     <div><dt>Owner</dt><dd>{{ page.owner }}</dd></div>
     {%- endif %}
   </dl>
+
+  {%- if page.kind == "intake" and _ent %}
+  {%- assign _req = _ent.attributes | where: "required", true %}
+  <h3 class="sec">Required attributes — <b>{{ _req.size }}</b></h3>
+  <p class="reqlist">{% for a in _req %}<span class="reqchip"><code>{{ a.name }}</code></span>{% endfor %}
+    <a class="srcnote" href="{{ _ent.url | relative_url }}#{{ _ent.name | downcase }}-attributes">All {{ _ent.name }} attributes →</a></p>
+  {%- endif %}
 
   {%- if page.fields and page.fields.size > 0 %}
   <h3 class="sec">{% if page.kind == "intake" %}Features ingested{% else %}Columns and who writes them{% endif %} — <b>{{ page.fields.size }}</b></h3>

@@ -1,4 +1,5 @@
-# Labels used across the catalog. Change wording here; it updates every page.
+# Labels used across the site. Change wording here; it updates every page.
+# Colours live in _sass/custom/custom.scss.
 
 kinds:
   model: Model
@@ -7,7 +8,7 @@ kinds:
   intake: Data intake
   store: Data store
 
-# status -> badge label and legend text (colours live in _sass/custom/custom.scss)
+# status -> badge label and legend text (legend order = order here)
 statuses:
   ok:
     label: "Served · persisting"
@@ -31,5 +32,11 @@ statuses:
     label: "To document"
     legend: "Not documented yet"
 
-# Catalog categories, in the order they appear on the Catalog page.
-categories: [Grants, Publications, Patents, Theses, Pipeline services]
+# urgency -> badge label (for data that is missing but should be integrated)
+urgency:
+  high: "Urgent"
+  medium: "Planned"
+  low: "Later"
+
+# Catalog categories, in the order they appear on Home.
+categories: [Grants, Publications, Patents, Theses, APIs, Scrapers, Storage]

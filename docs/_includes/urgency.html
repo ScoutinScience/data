@@ -1,0 +1,8 @@
+{%- comment -%}
+  Urgency marker for data that is missing but should be integrated.
+  Param: e (an entry page). Reads e.urgency (high | medium | low) and e.target_date (YYYY-MM-DD).
+{%- endcomment -%}
+{%- if include.e.urgency -%}
+{%- assign _lab = site.data.catalog.urgency[include.e.urgency] | default: include.e.urgency -%}
+<span class="urgency" data-u="{{ include.e.urgency }}" title="Target date for integration">{{ _lab }}{% if include.e.target_date %} · {{ include.e.target_date | date: "%-d %b %Y" }}{% endif %}</span>
+{%- endif -%}

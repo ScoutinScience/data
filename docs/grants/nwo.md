@@ -12,7 +12,8 @@ kind: intake                     # shown as "Data intake" (labels in _data/catal
 status: active                   # active | candidate | todo | ... (see _data/catalog.yml)
 description: "NWO provides a limited palette of funding lines; we extract the calls for each of their distinct objectives."
 location: "https://www.nwo.nl/en"
-serving: "Postgres — Grants table"
+storage: postgres-db             # entry_id of where it is stored (becomes a link)
+storage_table: Grants
 
 # How the data gets in. `service` is the entry_id of the service that does it (becomes a link).
 ingestion:
@@ -20,18 +21,13 @@ ingestion:
   service: scraping-service
 
 # Projects that use this data (ids from _data/projects.yml).
-projects: [matchmaking]
+projects: [matchmaking, gfs]
 # Projects it could feed but doesn't yet — shown dashed, as "potential".
 candidate_projects: []
 
-# The three features every grant source must provide (see the Grants page).
-fields:
-  - name: "Project title / description"
-    type: "Text"
-  - name: "Deadline"
-    type: "Date"
-  - name: "Budget"
-    type: "Amount"
+# Only for data that is missing but should be integrated:
+# urgency: high                  # high | medium | low
+# target_date: 2026-11-15
 
 open_questions: []
 ---

@@ -24,7 +24,7 @@ layout: default
   <a class="srv" href="{{ e.url | relative_url }}" data-s="{{ e.status | default: 'todo' }}">
     <span class="stripe"></span>
     <span class="nm">{{ e.title }}<span class="k">{{ e.group }} · {{ site.data.catalog.kinds[e.kind] | default: e.kind }}</span></span>
-    <span class="ct">{{ e.ingestion.method }}</span>
+    <span class="ct">{% include urgency.html e=e %}{% unless e.urgency %}{{ e.ingestion.method }}{% endunless %}</span>
   </a>
 {%- endif -%}{%- endfor -%}
 {%- if n == 0 %}<div class="none">None recorded yet.</div>{% endif %}
@@ -37,7 +37,7 @@ layout: default
   <a class="srv candidate" href="{{ e.url | relative_url }}" data-s="candidate">
     <span class="stripe"></span>
     <span class="nm">{{ e.title }}<span class="k">{{ e.group }} · {{ site.data.catalog.kinds[e.kind] | default: e.kind }}</span></span>
-    <span class="ct">potential</span>
+    <span class="ct">{% include urgency.html e=e %}{% unless e.urgency %}potential{% endunless %}</span>
   </a>
 {%- endif -%}{%- endfor -%}
 {%- if n == 0 %}<div class="none">None recorded yet. Add <code>candidate_projects: [{{ pid }}]</code> to an entry to list it here.</div>{% endif %}
