@@ -12,23 +12,19 @@ kind: intake
 status: todo                     # change to active once ingestion runs
 description: "The EU's key funding programme for research and innovation; we extract its open calls."
 location: "https://research-and-innovation.ec.europa.eu/funding/funding-opportunities/funding-programmes-and-open-calls/horizon-europe_en"
-serving: "Postgres — Grants table"
+storage: postgres-db             # entry_id of where it is stored (becomes a link)
+storage_table: Grants
 
 ingestion:
-  method: Scraping
-  service: scraping-service
+  method: API
+  service: horizon-api
 
 projects: [matchmaking]
 candidate_projects: []
 
-# The three features every grant source must provide (see the Grants page).
-fields:
-  - name: "Project title / description"
-    type: "Text"
-  - name: "Deadline"
-    type: "Date"
-  - name: "Budget"
-    type: "Amount"
+# Only for data that is missing but should be integrated:
+# urgency: high                  # high | medium | low
+# target_date: 2026-11-15
 
 open_questions: []
 ---
