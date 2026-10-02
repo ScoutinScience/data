@@ -20,12 +20,11 @@
   <div class="sis-group">
     {%- unless include.group -%}<div class="domain">{{ g.name | default: "Ungrouped" }}</div>{%- endunless -%}
     {%- for e in g.items -%}
-      {%- assign _n = e.inputs.size | plus: e.outputs.size | plus: e.fields.size -%}
-      {%- capture _hay -%}{{ e.title }} {{ e.kind }} {{ e.group }} {{ e.location }} {{ e.serving }} {{ e.ingestion.method }} {{ e.projects | join: " " }} {{ e.candidate_projects | join: " " }} {% for i in e.inputs %}{{ i.name }} {{ i.form }} {% endfor %}{% for o in e.outputs %}{{ o.name }} {{ o.note }} {% endfor %}{% for f in e.fields %}{{ f.name }} {% endfor %}{%- endcapture -%}
+            {%- capture _hay -%}{{ e.title }} {{ e.kind }} {{ e.group }} {{ e.location }} {{ e.serving }} {{ e.ingestion.method }} {{ e.projects | join: " " }} {{ e.candidate_projects | join: " " }} {% for i in e.inputs %}{{ i.name }} {{ i.form }} {% endfor %}{% for o in e.outputs %}{{ o.name }} {{ o.note }} {% endfor %}{% for f in e.fields %}{{ f.name }} {% endfor %}{%- endcapture -%}
     <a class="srv" href="{{ e.url | relative_url }}" data-s="{{ e.status | default: 'todo' }}" data-hay="{{ _hay | downcase | strip_newlines | escape }}">
       <span class="stripe"></span>
       <span class="nm">{{ e.title }}<span class="k">{{ site.data.catalog.kinds[e.kind] | default: e.kind }}</span></span>
-      <span class="ct" title="Inputs + outputs + fields">{{ _n }}</span>
+      <span class="ct">{% include urgency.html e=e %}{% unless e.urgency %}{{ site.data.catalog.statuses[e.status].label | default: e.status }}{% endunless %}</span>
     </a>
     {%- endfor -%}
   </div>

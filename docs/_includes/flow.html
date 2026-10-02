@@ -1,0 +1,153 @@
+{%- comment -%}
+  Flow diagram: Source —method→ Entity —storage→ Project(s).
+
+  Nothing here needs editing to add connections. The diagram is built from the
+  front matter of every data-source page (kind: intake):
+    group                → which entity it becomes (_data/entities.yml, by category)
+    ingestion.service    → label on the Source → Entity arrow (falls back to ingestion.method)
+    storage              → label on the Entity → Project arrow
+    projects             → solid arrows (in the pipeline)
+    candidate_projects   → dashed arrows (potential, not in the pipeline yet)
+    status, urgency, target_date → colour and marker of the source box
+{%- endcomment -%}
+{%- assign _all = site.pages | where_exp: "p", "p.entry_id != nil" | sort: "title" -%}
+<figure class="sis-flow" id="sis-flow">
+  <div class="sis-flow-scroll"><svg class="sis-flow-svg" role="img" aria-label="How data sources connect to entities and projects"></svg></div>
+  <figcaption class="sis-flow-key">
+    <span><i class="k-line"></i>In the pipeline</span>
+    <span><i class="k-line dashed"></i>Potential — not in the pipeline yet</span>
+    <span><i class="k-dot"></i>Waiting to be integrated (target date)</span>
+    <span class="k-note">Box colours follow the status legend below. Every box and arrow label links to its page.</span>
+  </figcaption>
+  <noscript><p class="none">The diagram needs JavaScript. Every connection is also listed on the entry pages.</p></noscript>
+</figure>
+<script type="application/json" id="sis-flow-data">
+{
+  "entries": [{% for e in _all %}{"id": {{ e.entry_id | jsonify }}, "title": {{ e.title | jsonify }}, "url": {{ e.url | relative_url | jsonify }}, "kind": {{ e.kind | jsonify }}, "group": {{ e.group | jsonify }}, "status": {{ e.status | default: "todo" | jsonify }}, "statusLabel": {{ site.data.catalog.statuses[e.status].label | jsonify }}, "method": {{ e.ingestion.method | jsonify }}, "service": {{ e.ingestion.service | jsonify }}, "storage": {{ e.storage | jsonify }}, "projects": {{ e.projects | jsonify }}, "candidates": {{ e.candidate_projects | jsonify }}, "urgency": {{ site.data.catalog.urgency[e.urgency] | jsonify }}, "target": {{ e.target_date | date: "%-d %b %Y" | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}],
+  "entities": [{% for x in site.data.entities %}{"name": {{ x.name | jsonify }}, "category": {{ x.category | jsonify }}, "url": {{ x.url | relative_url | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}],
+  "projects": [{% for x in site.data.projects %}{"id": {{ x.id | jsonify }}, "title": {{ x.title | jsonify }}, "url": {{ x.url | relative_url | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}]
+}
+</script>
+<script>
+(function () {
+  var data = JSON.parse(document.getElementById("sis-flow-data").textContent);
+  var svg = document.querySelector("#sis-flow .sis-flow-svg");
+  var NS = "http://www.w3.org/2000/svg";
+  var byId = {}; data.entries.forEach(function (e) { byId[e.id] = e; });
+  // ---- geometry ----
+  var COL = { src: { x: 0, w: 220 }, ent: { x: 390, w: 170 }, prj: { x: 740, w: 200 } };
+  var W = 940, ROW = 58, BOX = 42, TOP = 34;
+  // ---- nodes ----
+  var entOrder = data.entities.map(function (x) { return x.category; });
+  var sources = data.entries.filter(function (e) { return e.kind === "intake"; })
+    .sort(function (a, b) { return (entOrder.indexOf(a.group) - entOrder.indexOf(b.group)) || a.title.localeCompare(b.title); });
+  var entities = data.entities.map(function (x) {
+    return { name: x.name, url: x.url, category: x.category,
+             n: sources.filter(function (s) { return s.group === x.category; }).length };
+  });
+  var projects = data.projects;
+  var rows = Math.max(sources.length, entities.length, projects.length, 1);
+  var H = TOP + rows * ROW + 8;
+  svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+  svg.style.minWidth = "720px";
+  function ys(n) { var off = TOP + (rows - n) * ROW / 2; return function (i) { return off + i * ROW + (ROW - BOX) / 2; }; }
+  var ySrc = ys(sources.length), yEnt = ys(entities.length), yPrj = ys(projects.length);
+  function el(tag, attrs, parent) {
+    var n = document.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  }
+  function link(url, parent, cls) { return el("a", { href: url, "class": cls }, parent); }
+  function clip(s, n) { return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+  var gEdges = el("g", { "class": "edges" }, svg);
+  var gLabels = el("g", { "class": "labels" }, svg);
+  var gNodes = el("g", { "class": "nodes" }, svg);
+  // column headings
+  [["Source", COL.src], ["Entity", COL.ent], ["Project(s)", COL.prj]].forEach(function (h) {
+    el("text", { x: h[1].x + h[1].w / 2, y: 14, "class": "col-h", "text-anchor": "middle" }, svg).textContent = h[0];
+  });
+  function box(g, x, y, w, cls, title, sub, url, status) {
+    var a = link(url, g, "node " + cls);
+    el("rect", { x: x, y: y, width: w, height: BOX, rx: 6, "class": "box", "data-s": status || null }, a);
+    if (status) el("rect", { x: x, y: y, width: 4, height: BOX, rx: 2, "class": "stripe", "data-s": status }, a);
+    el("text", { x: x + (status ? 14 : w / 2), y: y + (sub ? 17 : 26), "class": "t", "text-anchor": status ? "start" : "middle" }, a).textContent = clip(title, 26);
+    if (sub) el("text", { x: x + (status ? 14 : w / 2), y: y + 32, "class": "s" + (sub.urgent ? " urgent" : ""), "text-anchor": status ? "start" : "middle" }, a).textContent = sub.text;
+    return a;
+  }
+  function edge(x1, y1, x2, y2, dashed, noHead) {
+    var dx = (x2 - x1) / 2;
+    el("path", { d: "M" + x1 + "," + y1 + " C" + (x1 + dx) + "," + y1 + " " + (x2 - dx) + "," + y2 + " " + x2 + "," + y2,
+                 "class": "edge" + (dashed ? " dashed" : ""), "marker-end": noHead ? null : "url(#sis-arrow" + (dashed ? "-d" : "") + ")" }, gEdges);
+  }
+  // point on the same curve at t (0..1), used to place labels where edges are still apart
+  function at(x1, y1, x2, y2, t) {
+    var dx = (x2 - x1) / 2, u = 1 - t;
+    return { x: u*u*u*x1 + 3*u*u*t*(x1+dx) + 3*u*t*t*(x2-dx) + t*t*t*x2,
+             y: u*u*u*y1 + 3*u*u*t*y1 + 3*u*t*t*y2 + t*t*t*y2 };
+  }
+  function label(x, y, parts) {
+    var t = el("text", { x: x, y: y + 4, "text-anchor": "middle", "class": "lab" }, gLabels);
+    parts.forEach(function (p, i) {
+      if (i) el("tspan", {}, t).textContent = ", ";
+      if (p.url) { var a = link(p.url, t); el("tspan", { "class": "lk" }, a).textContent = p.text; }
+      else el("tspan", {}, t).textContent = p.text;
+    });
+  }
+  // arrow markers
+  var defs = el("defs", {}, svg);
+  [["sis-arrow", "edge-head"], ["sis-arrow-d", "edge-head dashed"]].forEach(function (m) {
+    var mk = el("marker", { id: m[0], viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+    el("path", { d: "M0,0 L10,5 L0,10 z", "class": m[1] }, mk);
+  });
+  // ---- draw nodes ----
+  var posEnt = {}, posPrj = {};
+  entities.forEach(function (x, i) {
+    var y = yEnt(i); posEnt[x.category] = y + BOX / 2;
+    box(gNodes, COL.ent.x, y, COL.ent.w, "ent" + (x.n ? "" : " empty"), x.name,
+        { text: x.n + (x.n === 1 ? " source" : " sources") }, x.url);
+  });
+  projects.forEach(function (p, i) {
+    var y = yPrj(i); posPrj[p.id] = y + BOX / 2;
+    box(gNodes, COL.prj.x, y, COL.prj.w, "prj", p.title, null, p.url);
+  });
+  // ---- sources and Source → Entity edges ----
+  var e2p = {}; // "category|project" -> { dashed, storages: {} }
+  sources.forEach(function (s, i) {
+    var y = ySrc(i), cy = y + BOX / 2;
+    var sub = s.urgency ? { text: s.urgency + (s.target ? " · " + s.target : ""), urgent: true } : { text: s.statusLabel || s.status };
+    var a = box(gNodes, COL.src.x, y, COL.src.w, "src" + (s.status === "candidate" ? " candidate" : ""), s.title, sub, s.url, s.status);
+    if (s.urgency) el("circle", { cx: COL.src.x + COL.src.w - 10, cy: y + 10, r: 4.5, "class": "udot" }, a);
+    if (posEnt[s.group] == null) return;
+    var dashed = s.status === "candidate";
+    var x1 = COL.src.x + COL.src.w, x2 = COL.ent.x - 2;
+    edge(x1, cy, x2, posEnt[s.group], dashed);
+    var svc = s.service && byId[s.service];
+    var lab = svc ? [{ text: svc.title, url: svc.url }] : (s.method ? [{ text: s.method }] : []);
+    var pt = at(x1, cy, x2, posEnt[s.group], 0.3);
+    if (lab.length) label(pt.x, pt.y, lab);
+    function add(pid, isCand) {
+      var k = s.group + "|" + pid;
+      var r = e2p[k] || (e2p[k] = { cat: s.group, pid: pid, dashed: true, storages: {} });
+      if (!isCand && !dashed) r.dashed = false;
+      if (s.storage) r.storages[s.storage] = true;
+    }
+    (s.projects || []).forEach(function (p) { add(p, false); });
+    (s.candidates || []).forEach(function (p) { add(p, true); });
+  });
+  // ---- Entity → Project edges: one trunk per entity (labelled with its storage), then a branch per project ----
+  var TRUNK = 120;
+  var byCat = {};
+  Object.keys(e2p).forEach(function (k) { var r = e2p[k]; if (posPrj[r.pid] != null) (byCat[r.cat] = byCat[r.cat] || []).push(r); });
+  Object.keys(byCat).forEach(function (cat) {
+    var list = byCat[cat], x1 = COL.ent.x + COL.ent.w, y1 = posEnt[cat], jx = x1 + TRUNK;
+    var allDashed = list.every(function (r) { return r.dashed; });
+    var st = {}; list.forEach(function (r) { Object.keys(r.storages).forEach(function (id) { st[id] = true; }); });
+    el("path", { d: "M" + x1 + "," + y1 + " H" + jx, "class": "edge" + (allDashed ? " dashed" : "") }, gEdges);
+    list.forEach(function (r) { edge(jx, y1, COL.prj.x - 2, posPrj[r.pid], r.dashed); });
+    var parts = Object.keys(st).map(function (id) { var t = byId[id]; return t ? { text: t.title, url: t.url } : { text: id }; });
+    if (parts.length) label(x1 + TRUNK / 2, y1, parts);
+  });
+  if (!sources.length) el("text", { x: COL.src.x + COL.src.w / 2, y: TOP + 26, "text-anchor": "middle", "class": "s" }, svg).textContent = "No data sources yet";
+})();
+</script>
