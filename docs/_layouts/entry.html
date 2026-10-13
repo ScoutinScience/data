@@ -60,6 +60,24 @@ layout: default
     {%- if page.owner and page.owner != "" %}
     <div><dt>Owner</dt><dd>{{ page.owner }}</dd></div>
     {%- endif %}
+    {%- if page.institutions %}
+    <div><dt>Institutions</dt><dd>{{ page.institutions | join: ", " }}</dd></div>
+    {%- endif %}
+    {%- if page.level %}
+    <div><dt>Level</dt><dd>{{ page.level | join: ", " }}</dd></div>
+    {%- endif %}
+    {%- if page.tier %}
+    <div><dt>Tier</dt><dd><span class="tierbadge" data-t="{{ page.tier }}">{{ page.tier }}</span><span class="srcnote">{{ site.data.catalog.tiers[page.tier] }}</span></dd></div>
+    {%- endif %}
+    {%- if page.records %}
+    <div><dt>Records</dt><dd>{{ page.records }}</dd></div>
+    {%- endif %}
+    {%- if page.license %}
+    <div><dt>Licence</dt><dd>{{ page.license }}</dd></div>
+    {%- endif %}
+    {%- if page.links and page.links.size > 0 %}
+    <div><dt>Links</dt><dd>{% for l in page.links %}<a href="{{ l.url }}">{{ l.title }}</a>{% unless forloop.last %}<br>{% endunless %}{% endfor %}</dd></div>
+    {%- endif %}
   </dl>
 
   {%- if page.kind == "intake" and _ent %}

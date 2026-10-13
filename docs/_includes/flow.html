@@ -12,6 +12,7 @@
 {%- endcomment -%}
 {%- assign _all = site.pages | where_exp: "p", "p.entry_id != nil" | sort: "title" -%}
 <figure class="sis-flow" id="sis-flow">
+  <div class="sis-flow-filter" role="group" aria-label="Show data for one project"></div>
   <div class="sis-flow-scroll"><svg class="sis-flow-svg" role="img" aria-label="How data sources connect to entities and projects"></svg></div>
   <figcaption class="sis-flow-key">
     <span><i class="k-line"></i>In the pipeline</span>
@@ -37,15 +38,30 @@
   // ---- geometry ----
   var COL = { src: { x: 0, w: 220 }, ent: { x: 390, w: 170 }, prj: { x: 740, w: 200 } };
   var W = 940, ROW = 58, BOX = 42, TOP = 34;
+  // ---- project filter (All / one project) ----
+  var PID = null;
+  var bar = document.querySelector("#sis-flow .sis-flow-filter");
+  function button(label, pid) {
+    var b = document.createElement("button"); b.type = "button"; b.textContent = label;
+    b.setAttribute("aria-pressed", String(pid === PID));
+    b.addEventListener("click", function () { PID = pid; render(); bar.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); }); });
+    bar.appendChild(b);
+  }
+  button("All projects", null);
+  data.projects.forEach(function (p) { button(p.title, p.id); });
+  function render() {
+  while (svg.firstChild) svg.removeChild(svg.firstChild);
   // ---- nodes ----
   var entOrder = data.entities.map(function (x) { return x.category; });
-  var sources = data.entries.filter(function (e) { return e.kind === "intake"; })
+  var sources = data.entries.filter(function (e) {
+      return e.kind === "intake" && (!PID || (e.projects || []).indexOf(PID) >= 0 || (e.candidates || []).indexOf(PID) >= 0); })
     .sort(function (a, b) { return (entOrder.indexOf(a.group) - entOrder.indexOf(b.group)) || a.title.localeCompare(b.title); });
   var entities = data.entities.map(function (x) {
     return { name: x.name, url: x.url, category: x.category,
              n: sources.filter(function (s) { return s.group === x.category; }).length };
   });
-  var projects = data.projects;
+  if (PID) entities = entities.filter(function (x) { return x.n > 0; });
+  var projects = PID ? data.projects.filter(function (p) { return p.id === PID; }) : data.projects;
   var rows = Math.max(sources.length, entities.length, projects.length, 1);
   var H = TOP + rows * ROW + 8;
   svg.setAttribute("viewBox", "0 0 " + W + " " + H);
@@ -87,9 +103,10 @@
              y: u*u*u*y1 + 3*u*u*t*y1 + 3*u*t*t*y2 + t*t*t*y2 };
   }
   function label(x, y, parts) {
-    var t = el("text", { x: x, y: y + 4, "text-anchor": "middle", "class": "lab" }, gLabels);
+    // one line per part, stacked around y
+    var y0 = y + 4 - (parts.length - 1) * 7;
     parts.forEach(function (p, i) {
-      if (i) el("tspan", {}, t).textContent = ", ";
+      var t = el("text", { x: x, y: y0 + i * 14, "text-anchor": "middle", "class": "lab" }, gLabels);
       if (p.url) { var a = link(p.url, t); el("tspan", { "class": "lk" }, a).textContent = p.text; }
       else el("tspan", {}, t).textContent = p.text;
     });
@@ -127,6 +144,7 @@
     var pt = at(x1, cy, x2, posEnt[s.group], 0.3);
     if (lab.length) label(pt.x, pt.y, lab);
     function add(pid, isCand) {
+      if (PID && pid !== PID) return;
       var k = s.group + "|" + pid;
       var r = e2p[k] || (e2p[k] = { cat: s.group, pid: pid, dashed: true, storages: {} });
       if (!isCand && !dashed) r.dashed = false;
@@ -136,7 +154,7 @@
     (s.candidates || []).forEach(function (p) { add(p, true); });
   });
   // ---- Entity → Project edges: one trunk per entity (labelled with its storage), then a branch per project ----
-  var TRUNK = 120;
+  var TRUNK = 150;
   var byCat = {};
   Object.keys(e2p).forEach(function (k) { var r = e2p[k]; if (posPrj[r.pid] != null) (byCat[r.cat] = byCat[r.cat] || []).push(r); });
   Object.keys(byCat).forEach(function (cat) {
@@ -149,5 +167,7 @@
     if (parts.length) label(x1 + TRUNK / 2, y1, parts);
   });
   if (!sources.length) el("text", { x: COL.src.x + COL.src.w / 2, y: TOP + 26, "text-anchor": "middle", "class": "s" }, svg).textContent = "No data sources yet";
+  }
+  render();
 })();
 </script>

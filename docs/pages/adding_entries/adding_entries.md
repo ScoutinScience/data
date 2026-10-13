@@ -1,6 +1,6 @@
 ---
 title: Add a data source
-nav_order: 8
+nav_order: 10
 ---
 
 # Add a data source
@@ -47,12 +47,15 @@ Every data source, service or store is **one Markdown file**. Its page, its row 
 
 | Folder | Category |
 |:--|:--|
-| `docs/grants/` | Grants |
+| `docs/grants/` | Grants (open calls) |
+| `docs/proposals/` | Proposals with outcomes |
+| `docs/funded-projects/` | Funded projects |
 | `docs/publications/` | Publications |
 | `docs/patents/` | Patents |
 | `docs/theses/` | Theses |
 | `docs/ingestors/apis/` | API ingestors |
 | `docs/ingestors/scrapers/` | Scrapers |
+| `docs/ingestors/fetch-scripts/` | Batch fetch scripts |
 | `docs/storage/` | Where data is stored |
 
 The quickest start is to copy `docs/grants/nwo.md` and change it.
@@ -74,6 +77,9 @@ The quickest start is to copy `docs/grants/nwo.md` and change it.
 | `location` | | Website for a source, repo path for a service, table name for a store |
 | `storage` | sources | `entry_id` of where the data is stored, e.g. `postgres-db` (becomes a link and the label on the diagram) |
 | `storage_table` | | Table name, e.g. `Grants` |
+| `institutions`, `level` | | For theses: institutions the platform covers, and degree level(s) |
+| `tier`, `records`, `license` | | Data-quality tier (A–D, see `_data/catalog.yml`), record counts, and reuse terms |
+| `links` | | Extra links: list of `title` and `url` (papers, repositories) |
 | `serving` | services | The endpoint a service runs on |
 | `ingestion` | sources | `method` (API, Scraping, Manual, …) and `service` (the `entry_id` of the ingestor that does it, e.g. `openalex-api` or `scraping-service` — becomes a link) |
 | `projects` | | Projects that use this data, e.g. `[matchmaking]` |

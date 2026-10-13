@@ -281,3 +281,22 @@ h3.sec { font-family: var(--sis-display); font-weight: 500 !important; text-tran
 .site-nav .nav-list-link:hover { background: rgba(255,255,255,.7); }
 .site-nav .nav-list-link.active { background: #fff; color: var(--sis-deep) !important; font-weight: 600; box-shadow: inset 3px 0 0 var(--sis-teal); }
 .site-nav .nav-list-expander { color: var(--sis-teal); }
+
+// GFS data-quality tier badge (A best → D proxy)
+.tierbadge {
+  display: inline-block; min-width: 22px; text-align: center; font-family: var(--sis-display); font-weight: 600;
+  border-radius: 5px; padding: 0 7px; margin-right: 6px; color: #fff; background: var(--sis-deep);
+}
+.tierbadge[data-t="B"] { background: var(--sis-teal); }
+.tierbadge[data-t="C"] { background: var(--sis-aqua); }
+.tierbadge[data-t="D"] { background: var(--sis-todo); }
+
+// Diagram project filter
+.sis-flow-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.sis-flow-filter button {
+  font-family: var(--sis-display); font-size: 13px; font-weight: 500; cursor: pointer;
+  padding: 4px 14px; border-radius: 999px; border: 1px solid var(--sis-teal);
+  background: var(--sis-surface); color: var(--sis-deep);
+}
+.sis-flow-filter button:hover { background: var(--sis-teal-soft); }
+.sis-flow-filter button[aria-pressed="true"] { background: var(--sis-deep); border-color: var(--sis-deep); color: #F1EBE4; }
