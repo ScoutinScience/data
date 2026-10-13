@@ -1,6 +1,6 @@
 ---
 title: Theses
-nav_order: 5
+nav_order: 7
 has_children: true
 has_toc: false
 permalink: /theses/
@@ -8,8 +8,7 @@ permalink: /theses/
 
 # Theses
 
-<!-- Describe what Theses data we collect and why. -->
-_Category overview to be written._
+Bachelor, master, PhD and universities-of-applied-sciences theses, collected from each institution's repository. Pages are per **platform**: one platform can cover several institutions. Collection is manual for now.
 
 ## Thesis attributes
 
